@@ -1,4 +1,22 @@
-const CreateBlog = ({handleCreate, blog, handleBlogChange}) => {
+import { useState } from 'react'
+
+const CreateBlog = ({createBlog}) => {
+  const [newBlog, setNewBlog] = useState({
+    title: '',
+    author: '',
+    url: ''
+  })
+  
+  const handleCreate = async event => {
+    event.preventDefault()
+    createBlog(newBlog)
+    setNewBlog({
+      title: '',
+      author: '',
+      url: ''
+    })
+  }
+
   return (
     <div>
       <h2>create new</h2>
@@ -7,27 +25,27 @@ const CreateBlog = ({handleCreate, blog, handleBlogChange}) => {
           title:
           <input 
             type="text"
-            value={blog.title}
+            value={newBlog.title}
             name="Title"
-            onChange={({target}) => {handleBlogChange({...blog, title: target.value})}}
+            onChange={({target}) => {setNewBlog({...newBlog, title: target.value})}}
           />
         </div>
         <div>
           author:
           <input 
             type="text"
-            value={blog.author}
+            value={newBlog.author}
             name="Author"
-            onChange={({target}) => {handleBlogChange({...blog, author: target.value})}}
+            onChange={({target}) => {setNewBlog({...newBlog, author: target.value})}}
           />
         </div>
         <div>
           url:
           <input 
             type="text"
-            value={blog.url}
+            value={newBlog.url}
             name="Url"
-            onChange={({target}) => {handleBlogChange({...blog, url: target.value})}}
+            onChange={({target}) => {setNewBlog({...newBlog, url: target.value})}}
           />
         </div>
         <button type="submit">create</button>
