@@ -1,19 +1,35 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Notification from './components/Notification'
+import CreateBlog from './components/CreateBlog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState({})
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const [newBlog, setNewBlog] = useState({
+    title: '',
+    author: '',
+    url: ''
+  })
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
     )  
+  }, [])
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
+    if(loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      blogService.setToken(user.token)
+    }
   }, [])
 
   const handleLogin = async (event) => {
@@ -23,15 +39,39 @@ const App = () => {
       const user = await loginService.login({
         username, password,
       })
+
+      window.localStorage.setItem(
+        'loggedBlogappUser', JSON.stringify(user)
+      )
+
+      blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setErrorMessage('Wrong credentials')
+      setErrorMessage({ text: 'Wrong credentials', success: false })
       setTimeout(() => {
-        setErrorMessage(null)
+        setErrorMessage({})
       }, 5000)
     }
+  }
+
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogappUser')
+    setUser(null)
+    blogService.setToken('')
+  }
+
+  const handleCreate = async event => {
+    event.preventDefault()
+
+    const savedBlog = await blogService.create(newBlog)
+    setBlogs(blogs.concat(savedBlog))
+    setNewBlog({
+      title: '',
+      author: '',
+      url: ''
+    })
   }
 
   const loginForm = () => (
@@ -58,24 +98,29 @@ const App = () => {
     </form>
   )
 
-  const noteForm = () => (
-    <p>stub</p>
-  )
-
   if(user === null) {
     return (
-      <>
+      <div>
+        <Notification message={errorMessage} />
+
         <h2>log in to application</h2>
         {loginForm()}
-      </>
+      </div>
     )
   }
 
   return (
     <div>
+      <Notification message={errorMessage} />
+
       <h2>blogs</h2>
 
-      <p>{user.name} is logged in</p>
+      <p>
+        {user.name} is logged in
+        <button onClick={handleLogout}>logout</button>
+      </p>
+
+      <CreateBlog handleCreate={handleCreate} blog={newBlog} handleBlogChange={setNewBlog} />
 
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
