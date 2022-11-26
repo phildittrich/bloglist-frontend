@@ -49,7 +49,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setErrorMessage({ text: 'Wrong credentials', success: false })
+      setErrorMessage({ text: 'wrong username or password', success: false })
       setTimeout(() => {
         setErrorMessage({})
       }, 5000)
@@ -65,13 +65,24 @@ const App = () => {
   const handleCreate = async event => {
     event.preventDefault()
 
-    const savedBlog = await blogService.create(newBlog)
-    setBlogs(blogs.concat(savedBlog))
-    setNewBlog({
-      title: '',
-      author: '',
-      url: ''
-    })
+    try {
+      const savedBlog = await blogService.create(newBlog)
+      setBlogs(blogs.concat(savedBlog))
+      setNewBlog({
+        title: '',
+        author: '',
+        url: ''
+      })
+      setErrorMessage({ text: `a new blog ${savedBlog.title} by ${savedBlog.author} has been added`, success: true })
+      setTimeout(() => {
+        setErrorMessage({})
+      }, 5000)
+    } catch (exception) {
+      setErrorMessage({ text: 'an error occured', success: false })
+      setTimeout(() => {
+        setErrorMessage({})
+      }, 5000)
+    }
   }
 
   const loginForm = () => (
