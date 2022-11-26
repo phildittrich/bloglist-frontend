@@ -38,6 +38,8 @@ const App = () => {
         username, password,
       })
 
+      console.log(user)
+
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
       )
@@ -63,6 +65,7 @@ const App = () => {
   const addBlog = async (blogObject) => {
     try {
       const savedBlog = await blogService.create(blogObject)
+      console.log(savedBlog)
       createBlogRef.current.toggleVisibility()
       setBlogs(blogs.concat(savedBlog))
       setErrorMessage({ text: `a new blog ${savedBlog.title} by ${savedBlog.author} has been added`, success: true })
@@ -91,6 +94,11 @@ const App = () => {
         setErrorMessage({})
       }, 5000)
     }
+  }
+
+  const removeBlog = async (id) => {
+    blogService.remove(id)
+    setBlogs(blogs.filter(b => b.id !== id))
   }
 
   const loginForm = () => {
@@ -133,7 +141,7 @@ const App = () => {
 
       {blogs
         .sort((a, b) => b.likes - a.likes )
-        .map(blog => <Blog key={blog.id} blog={blog} update={updateBlog}/>)
+        .map(blog => <Blog key={blog.id} blog={blog} user={user} update={updateBlog} remove={removeBlog}/>)
       }
     </div>
   )
