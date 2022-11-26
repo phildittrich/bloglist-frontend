@@ -77,6 +77,22 @@ const App = () => {
     }
   }
 
+  const updateBlog = async (id, updateObject) => {
+    try {
+      const savedBlog = await blogService.update(id, updateObject)
+      setBlogs(blogs.map(b => b.id !== id ? b : savedBlog))
+      setErrorMessage({ text: `a like has been added to ${savedBlog.title} by ${savedBlog.author}`, success: true })
+      setTimeout(() => {
+        setErrorMessage({})
+      }, 5000)
+    } catch (exception) {
+      setErrorMessage({ text: 'an error occured', success: false })
+      setTimeout(() => {
+        setErrorMessage({})
+      }, 5000)
+    }
+  }
+
   const loginForm = () => {
     return (
       <LoginForm
@@ -116,7 +132,7 @@ const App = () => {
       </Togglable>
 
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} update={updateBlog}/>
       )}
     </div>
   )
