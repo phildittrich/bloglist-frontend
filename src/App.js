@@ -135,14 +135,16 @@ const App = () => {
         <button onClick={handleLogout}>logout</button>
       </p>
 
-      <Togglable buttonLabel="new note" ref={createBlogRef}>
+      <Togglable buttonLabel="new blog" ref={createBlogRef}>
         <CreateBlog createBlog={addBlog} />
       </Togglable>
 
-      {blogs
-        .sort((a, b) => b.likes - a.likes )
-        .map(blog => <Blog key={blog.id} blog={blog} user={user} update={updateBlog} remove={removeBlog}/>)
-      }
+      <div className="blog-list">
+        {blogs
+          .sort((a, b) => b.likes - a.likes )
+          .map(blog => <Blog key={blog.id} blog={blog} user={user} update={updateBlog} remove={removeBlog}/>)
+        }
+      </div>
     </div>
   )
 }
