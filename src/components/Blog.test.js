@@ -6,6 +6,7 @@ import Blog from './Blog'
 
 describe('<Blog />', () => {
   let container
+  let mockUpdate
 
   beforeEach(() => {
     const blog = {
@@ -27,7 +28,7 @@ describe('<Blog />', () => {
       name: 'Test User Name'
     }
 
-    const mockUpdate = jest.fn()
+    mockUpdate = jest.fn()
     const mockRemove = jest.fn()
 
     container = render(
@@ -45,12 +46,21 @@ describe('<Blog />', () => {
     expect(url).toHaveStyle('display: none')
   })
 
-  test('after clicking the show button url and number of likes are displayed', async () => {
+  test('displays url and number of likes after clicking the show button', async () => {
     const user = userEvent.setup()
     const button = screen.getByText('show')
     await user.click(button)
 
     const div = container.querySelector('.blog-url')
     expect(div).not.toHaveStyle('display: none')
+  })
+
+  test('calls the update function twice when like is clicked twice', async () => {
+    const user = userEvent.setup()
+    const button = screen.getByText('like')
+    await user.click(button)
+    await user.click(button)
+
+    expect(mockUpdate.mock.calls).toHaveLength(2)
   })
 })
